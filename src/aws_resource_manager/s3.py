@@ -1,9 +1,10 @@
 import os
-from dotenv import load_dotenv
+
 import boto3
 from botocore.exceptions import ClientError
+from dotenv import load_dotenv
 
-from src.get_logger import configure_logger
+from get_logger import configure_logger
 
 logger = configure_logger()
 
@@ -17,7 +18,6 @@ class S3Handler:
         If a region is specified, the methods within the S3Handler class will execute in that region.
         Otherwise, AWS will assign a default region.
 
-        :param region: AWS region specified by the user (default is None)
         :return: An instance of the S3Handler class initialized with the user's credentials and specified region
         """
         load_dotenv()
@@ -29,15 +29,20 @@ class S3Handler:
 
     def __init__(self, secret, access, region) -> None:
         """
-        Initializes the S3Handler class with user credentials and creates the AWS S3 client.
+        Initializes the S3Handler class with user credentials and creates
+        the AWS S3 client.
 
-        This constructor method initializes the S3Handler class using the provided secret and access keys.
-        It creates an AWS S3 client using the boto3 library. If no region is specified, AWS assigns a default
-        region. The created client is available for subsequent methods within the class.
+        This constructor method initializes the S3Handler class using the
+        provided secret and access keys. It creates an AWS S3 client using
+        the boto3 library. If no region is specified, AWS assigns the default
+        region identified via aws-cli. The created client is available for
+        subsequent methods within the class.
 
         :param secret: User's AWS secret key loaded from the environment file
         :param access: User's AWS access key loaded from the environment file
-        :param region: Specified AWS region during instantiation (default is None)
+        :param region: User's AWS region loaded from the environment file
+
+        Returns: None
         """
         if region is None:
             self.client = boto3.client(
@@ -54,7 +59,8 @@ class S3Handler:
 
     def list_buckets(self) -> list:
         """
-        Retrieves and returns a list of bucket names available in the user's AWS account.
+        Retrieves and returns a list of bucket names available in the user's
+        AWS account.
 
         :return: A list of the S3 bucket names, or None if an error occurs.
         """
@@ -64,9 +70,11 @@ class S3Handler:
             all_buckets = [bucket["Name"] for bucket in buckets]
             logger.info(f"This account contains the following buckets: {all_buckets}")
             return all_buckets
+
         except Exception as e:
             logger.error(f"An error occurred while listing buckets: {e}")
             return None
+
         except self.client.exceptions.ClientError as e:
             logger.error(f"An AWS client error occurred: {e}")
             return None
@@ -76,9 +84,10 @@ class S3Handler:
         """
         Creates an S3 bucket in the user's AWS account.
 
-        This method creates a new S3 bucket in the region specified during the instantiation of the class.
-        If the bucket name has already been used, it will not create a new bucket. If no region is specified,
-        the bucket is created in the default S3 region (us-east-1).
+        This method creates a new S3 bucket in the region specified during the
+        instantiation of the class. If the bucket name has already been used,
+        it will not create a new bucket. If no region is specified, the bucket
+        is created in the default S3 region.
 
         :param bucket_name: Name of the bucket to be created
 
@@ -92,9 +101,10 @@ class S3Handler:
                 self.client.create_bucket(
                     Bucket=bucket_name, CreateBucketConfiguration=self.location)
                 logger.info(f"The bucket {bucket_name} has been successfully created")
-        
+
+        except ClientError as e:
+            logger.error(f"An AWS client error occurred while creating S3 bucket {bucket_name}: {e}")
+
         except Exception as e:
             logger.error(f"An error occurred while creating the bucket: {e}")
 
-        except ClientError as e:
-            logger.error(f"Error creating S3 bucket {bucket_name}: {e}")

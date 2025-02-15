@@ -1,4 +1,3 @@
-"""Tests for the S3 module of the AWS Resource Manager package.""" 
 from botocore.exceptions import ClientError
 
 from src.aws_resource_manager.s3.s3 import S3Handler

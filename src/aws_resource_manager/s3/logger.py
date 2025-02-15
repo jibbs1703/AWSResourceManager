@@ -1,10 +1,11 @@
 """Logger Module for AWS Resource Manager"""
 import logging
 
+
 def configure_logger():
     # Create a logger
-    logger = logging.getLogger(__name__)  # Or a specific name
-    logger.setLevel(logging.DEBUG)  # Set the minimum level to log
+    configured_logger = logging.getLogger(__name__)  # Or a specific name
+    configured_logger.setLevel(logging.DEBUG)  # Set the minimum level to log
 
     # Create a handler for console output (stderr by default)
     handler = logging.StreamHandler()
@@ -14,9 +15,10 @@ def configure_logger():
     handler.setFormatter(formatter)
 
     # Add the handler to the logger
-    logger.addHandler(handler)
+    configured_logger.addHandler(handler)
 
-    return logger
+    return configured_logger
+
 
 if __name__ == '__main__':
     # Create Console Logger from Function

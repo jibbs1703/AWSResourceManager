@@ -325,3 +325,165 @@ class S3Handler:
             logger.exception(f"Unexpected error deleting file: {e}")
             return (f"Error: Unexpected error occurred while deleting the file '{file_name}'"
                      "from the bucket '{bucket_name}'.")
+        
+        ## New Functionalities
+
+    def copy_object(self, source_bucket:str, source_object:str,
+                    destination_bucket:str, destination_object:str)-> None:
+        """
+        Copy an object from one S3 location to another.
+
+        :param source_bucket: The source S3 bucket
+        :param source_object: The source object key
+        :param destination_object: The destination object key
+        """
+        try:
+            logger.info(
+                f"Copying object from s3://{source_bucket}/{source_object}"
+                f"to s3://{destination_bucket}/{destination_object}")
+            self.client.copy_object(Bucket=destination_bucket,
+                                CopySource={'Bucket': source_bucket, 'Key': source_object},
+                                Key=destination_object)
+            logger.info(f"Object copied to s3://{destination_bucket}/{destination_object}")
+        except ClientError as e:
+            logger.error(
+                f"Error copying object from s3://{source_bucket}/{source_object}"
+                f"to s3://{destination_bucket}/{destination_object}: {e}")
+
+    def move_object(self, source_bucket:str, source_object:str,
+                    destination_bucket:str, destination_object:str) ->None:
+        """
+        Move an object (copy and then delete original).
+
+        :param source_bucket: The source S3 bucket
+        :param source_object: The source object key
+        :param destination_object: The destination object key
+        """
+        self.copy_object(source_bucket=source_bucket, source_object=source_object, 
+                         destination_bucket=destination_bucket,
+                         destination_object=destination_object)
+        self.delete_object(bucket_name=source_bucket, object_name=source_object)
+
+    def list_objects_by_prefix(self, bucket_name:str, prefix:str):
+        """
+        List objects in the bucket by prefix (like a folder).
+
+        :param prefix: The prefix to filter by (like "folder/")
+        """
+        try:
+            logger.info(f"Listing objects with prefix '{prefix}' in s3://{bucket_name}")
+            response = self.client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
+            if 'Contents' in response:
+                for obj in response['Contents']:
+                    logger.info(f"Object: {obj['Key']} (Last modified: {obj['LastModified']})")
+            else:
+                logger.info(f"No objects found with prefix '{prefix}' in s3://{bucket_name}")
+        except ClientError as e:
+            logger.error(f"Error listing objects by prefix in S3: {e}")
+
+    def set_object_acl(self,bucket_name:str, object_name:str, acl:str):
+        """
+        Set ACL (Access Control List) for an object.
+
+        :param object_name: The object name
+        :param acl: The ACL to set (e.g., 'private', 'public-read')
+        """
+        try:
+            logger.info(f"Setting ACL {acl} for object {object_name}")
+            self.client.put_object_acl(Bucket=bucket_name, Key=object_name, ACL=acl)
+            logger.info(f"ACL set to {acl} for object {object_name}")
+        except ClientError as e:
+            logger.error(f"Error setting ACL for object {object_name}: {e}")
+
+    def get_object_metadata(self, bucket_name:str, object_name:str):
+        """
+        Retrieve metadata for an object (e.g., size, content-type, etc.).
+
+        :param object_name: The name of the object
+        :return: Metadata dictionary or None if not found
+        """
+        try:
+            logger.info(f"Getting metadata for object {object_name}")
+            metadata = self.client.head_object(Bucket=bucket_name, Key=object_name)
+            logger.info(f"Metadata for {object_name}: {metadata}")
+            return metadata
+        except ClientError as e:
+            logger.error(f"Error retrieving metadata for object {object_name}: {e}")
+            return None
+
+    def enable_versioning(self, bucket_name:str):
+        """
+        Enable versioning for the S3 bucket.
+        """
+        try:
+            logger.info(f"Enabling versioning for bucket {bucket_name}")
+            self.client.put_bucket_versioning(Bucket=bucket_name,
+                                          VersioningConfiguration={'Status': 'Enabled'})
+            logger.info(f"Versioning enabled for bucket {bucket_name}")
+        except ClientError as e:
+            logger.error(f"Error enabling versioning for bucket {bucket_name}: {e}")
+
+    def disable_versioning(self, bucket_name:str):
+        """
+        Disable versioning for the S3 bucket.
+        """
+        try:
+            logger.info(f"Disabling versioning for bucket {bucket_name}")
+            self.client.put_bucket_versioning(Bucket=bucket_name,
+                                          VersioningConfiguration={'Status': 'Suspended'})
+            logger.info(f"Versioning disabled for bucket {bucket_name}")
+        except ClientError as e:
+            logger.error(f"Error disabling versioning for bucket {bucket_name}: {e}")
+
+    def restore_archived_object(self, bucket_name:str, object_name:str):
+        """
+        Restore an archived object (from Glacier) to standard storage class.
+
+        :param object_name: The name of the object to restore
+        """
+        try:
+            logger.info(f"Restoring archived object {object_name}")
+            self.client.restore_object(Bucket=bucket_name, Key=object_name,
+                                   RestoreRequest={'Days': 1,
+                                    'GlacierJobParameters': {'Tier': 'Standard'}})
+            logger.info(f"Object {object_name} restore requested.")
+        except ClientError as e:
+            logger.error(f"Error restoring archived object {object_name}: {e}")
+
+    def set_bucket_cors_policy(self, bucket_name:str, cors_rules):
+        """
+        Set a CORS (Cross-Origin Resource Sharing) policy for the bucket.
+
+        :param cors_rules: The CORS configuration rules
+        """
+        try:
+            logger.info(f"Setting CORS policy for bucket {bucket_name}")
+            self.client.put_bucket_cors(
+                Bucket=bucket_name, CORSConfiguration={'CORSRules': cors_rules})
+            logger.info(f"CORS policy set for bucket {bucket_name}")
+        except ClientError as e:
+            logger.error(f"Error setting CORS policy for bucket {bucket_name}: {e}")
+
+    def get_bucket_encryption(self, bucket_name:str):
+        """
+        Retrieves the encryption configuration for the specified S3 bucket.
+
+        Parameters:
+        bucket_name (str): The name of the bucket for which to retrieve the 
+        encryption configuration.
+
+        Returns:
+        dict: The encryption configuration of the bucket, or None if there was an error.
+
+        Raises:
+        ClientError: If there is an error retrieving the encryption configuration.
+
+        """
+        try:
+            logger.info(f"Getting encryption configuration for bucket {bucket_name}")
+            encryption = self.client.get_bucket_encryption(Bucket=bucket_name)
+            logger.info(f"Encryption configuration for bucket {bucket_name}: {encryption}")
+            return encryption
+        except ClientError as e:
+            logger.error(f"Error retrieving encryption configuration for bucket {bucket_name}: {e}")
+            return None

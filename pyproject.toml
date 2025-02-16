@@ -1,0 +1,52 @@
+[project]
+name = "aws_resource_manager"
+version = "1.0.0"
+description = "A Python toolkit for managing and using AWS resources"
+keywords = ["AWS Resource Manager", "S3", "Redshift", "EC2"]
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    {name = "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}
+]
+maintainers = [
+  {name = "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "boto3==1.36.11",
+    "botocore==1.36.11",
+    "python-dotenv==1.0.1",
+]
+[project.optional-dependencies]
+dev = [
+    "pytest>= 8.3.4",
+    "ruff==0.9.4",
+
+]
+
+[build-system]
+requires = ["setuptools", "build"]
+build-backend = "setuptools.build_meta"
+
+[took.setup.packages.find]
+where = "src"
+
+[tool.pytest.ini-options]
+markers = [
+    "unit: mark a test as a unit test"
+]
+testpaths = "tests"
+
+
+[project.scripts]
+
+[tool.coverage.run]
+omit = [
+
+]

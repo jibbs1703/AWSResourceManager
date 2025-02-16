@@ -325,9 +325,7 @@ class S3Handler:
             logger.exception(f"Unexpected error deleting file: {e}")
             return (f"Error: Unexpected error occurred while deleting the file '{file_name}'"
                      "from the bucket '{bucket_name}'.")
-        
-        ## New Functionalities
-
+  
     def copy_object(self, source_bucket:str, source_object:str,
                     destination_bucket:str, destination_object:str)-> None:
         """

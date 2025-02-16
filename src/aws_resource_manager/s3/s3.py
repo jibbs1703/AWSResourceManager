@@ -485,3 +485,26 @@ class S3Handler:
         except ClientError as e:
             logger.error(f"Error retrieving encryption configuration for bucket {bucket_name}: {e}")
             return None
+
+
+# Example usage:
+def main():  
+    # Instantiate the S3Handler
+    s3_handler = S3Handler.credentials()
+
+    # Use new functionalities:
+    s3_handler.copy_object('source-bucket', 'source-object.txt',
+                           'destination-bucket', 'destination-object.txt')
+    s3_handler.set_object_acl('bucket-name','object.txt', 'public-read')
+    metadata = s3_handler.get_object_metadata('bucket-name','object.txt')
+    print(metadata)
+    s3_handler.enable_versioning('bucket-name')
+    s3_handler.set_bucket_cors_policy('bucket-name',[{
+        'AllowedOrigins': ['*'],
+        'AllowedMethods': ['GET', 'POST'],
+        'AllowedHeaders': ['*']
+    }])
+
+
+if __name__ == "__main__":
+    main()

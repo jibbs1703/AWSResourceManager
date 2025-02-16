@@ -7,10 +7,17 @@ readme = "README.md"
 requires-python = ">=3.10"
 
 authors = [
+<<<<<<< HEAD
     {name = "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}
 ]
 maintainers = [
   {name = "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}
+=======
+    {name = : "Abraham Ajibade", email = "abraham0ajibade@gmail.com"}
+]
+maintainers = [
+  {name = "Brett Cannon", email = "brett@example.com"}
+>>>>>>> befaa0d996177310d3e44ec804209869f3e83375
 ]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
@@ -26,8 +33,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>= 8.3.4",
+<<<<<<< HEAD
     "ruff==0.9.4",
 
+=======
+>>>>>>> befaa0d996177310d3e44ec804209869f3e83375
 ]
 
 [build-system]

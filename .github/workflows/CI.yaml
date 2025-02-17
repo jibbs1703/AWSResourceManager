@@ -1,0 +1,45 @@
+name: AWS Resource Manager
+
+on:
+  push:
+    branches:
+      - "main"
+      - "feature/**"
+  pull_request:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Create .env file
+      run: | 
+        echo ACCESS_SECRET=${{ secrets.ACCESS_SECRET }} >> .env 
+        echo ACCESS_KEY=${{ secrets.ACCESS_KEY }} >> .env
+        echo REGION=${{ secrets.REGION }} >> .env
+
+    - name: Lint Python scripts with Ruff
+      run: |
+        python -m ruff check src/ tests/ 
+
+    - name: Test with pytest
+      run: |
+        pytest -s tests/

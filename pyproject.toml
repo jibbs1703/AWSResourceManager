@@ -35,6 +35,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
 version_file = "aws_resource_manager/_version.py"
+version_scheme = "post-release"
+local_scheme = "no-local-version"
 
 [tool.setup.packages.find]
 where = "src"

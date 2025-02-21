@@ -1,6 +1,6 @@
 [project]
 name = "aws_resource_manager"
-version = "1.0.0"
+dynamic = ["version"]
 description = "A Python toolkit for managing and using AWS resources"
 keywords = ["AWS Resource Manager", "S3", "Redshift", "EC2"]
 readme = "README.md"
@@ -30,8 +30,11 @@ dev = [
 ]
 
 [build-system]
-requires = ["setuptools", "build"]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_file = "aws_resource_manager/_version.py"
 
 [tool.setup.packages.find]
 where = "src"

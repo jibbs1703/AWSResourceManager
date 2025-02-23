@@ -52,7 +52,6 @@ class EC2Handler:
                 "ec2", aws_access_key_id=access, aws_secret_access_key=secret
             )
         else:
-            self.location = {"LocationConstraint": region}
             self.client = boto3.client(
                 "ec2",
                 aws_access_key_id=access,
@@ -83,9 +82,7 @@ class EC2Handler:
         :return: The ID of the created instance.
         """
         try:
-            logger.info(
-                f"Creating EC2 instance: {ami_id}, {instance_type}, KeyPair: {key_name}"
-            )
+            logger.info(f"Creating EC2 instance: {ami_id}, {instance_type}, KeyPair: {key_name}")
             response = self.client.run_instances(
                 ImageId=ami_id,
                 InstanceType=instance_type,
@@ -197,14 +194,10 @@ class EC2Handler:
                 logger.info(f"Instance {instance_id} is in state: {status}.")
                 return status
             else:
-                logger.warning(
-                    f"Instance {instance_id} does not have any status information."
-                )
+                logger.warning(f"Instance {instance_id} does not have any status information.")
                 return "No status info available"
         except ClientError as e:
-            logger.error(
-                f"Error getting status of EC2 instance {instance_id}: {e}"
-            )
+            logger.error(f"Error getting status of EC2 instance {instance_id}: {e}")
             return None
 
     def create_ami(
@@ -219,9 +212,7 @@ class EC2Handler:
         :return: The ID of the created AMI.
         """
         try:
-            logger.info(
-                f"Creating AMI from EC2 instance {instance_id}, AMI name: {name}"
-            )
+            logger.info(f"Creating AMI from EC2 instance {instance_id}, AMI name: {name}")
             response = self.client.create_image(
                 InstanceId=instance_id,
                 Name=name,
@@ -232,9 +223,7 @@ class EC2Handler:
             logger.info(f"AMI {ami_id} created from instance {instance_id}.")
             return ami_id
         except ClientError as e:
-            logger.error(
-                f"Error creating AMI from EC2 instance {instance_id}: {e}"
-            )
+            logger.error(f"Error creating AMI from EC2 instance {instance_id}: {e}")
             return None
 
     def modify_instance_type(self, instance_id: str, new_instance_type: str) -> None:
@@ -245,15 +234,11 @@ class EC2Handler:
         :param new_instance_type: The new instance type.
         """
         try:
-            logger.info(
-                f"Modifying instance {instance_id} to new type {new_instance_type}"
-            )
+            logger.info(f"Modifying instance {instance_id} to new type {new_instance_type}")
             self.client.modify_instance_attribute(
                 InstanceId=instance_id, InstanceType={"Value": new_instance_type}
             )
-            logger.info(
-                f"Instance {instance_id} type modified to {new_instance_type}."
-            )
+            logger.info(f"Instance {instance_id} type modified to {new_instance_type}.")
         except ClientError as e:
             logger.error(f"Error modifying instance type for {instance_id}: {e}")
 
@@ -265,35 +250,23 @@ class EC2Handler:
             logger.info(
                 f"Attaching volume {volume_id} to instance {instance_id} on device {device}"
             )
-            self.client.attach_volume(
-                InstanceId=instance_id, VolumeId=volume_id, Device=device
-            )
+            self.client.attach_volume(InstanceId=instance_id, VolumeId=volume_id, Device=device)
             logger.info(
                 f"Volume {volume_id} attached to instance {instance_id} on device {device}."
             )
         except ClientError as e:
-            logger.error(
-                f"Error attaching volume {volume_id} to instance {instance_id}: {e}"
-            )
+            logger.error(f"Error attaching volume {volume_id} to instance {instance_id}: {e}")
 
     def detach_volume(self, instance_id, volume_id):
         """
         Detach an EBS volume from an EC2 instance.
         """
         try:
-            logger.info(
-                f"Detaching volume {volume_id} from instance {instance_id}"
-            )
-            self.client.detach_volume(
-                InstanceId=instance_id, VolumeId=volume_id
-            )
-            logger.info(
-                f"Volume {volume_id} detached from instance {instance_id}."
-            )
+            logger.info(f"Detaching volume {volume_id} from instance {instance_id}")
+            self.client.detach_volume(InstanceId=instance_id, VolumeId=volume_id)
+            logger.info(f"Volume {volume_id} detached from instance {instance_id}.")
         except ClientError as e:
-            logger.error(
-                f"Error detaching volume {volume_id} from instance {instance_id}: {e}"
-            )
+            logger.error(f"Error detaching volume {volume_id} from instance {instance_id}: {e}")
 
     def create_key_pair(self, key_name):
         """
@@ -346,9 +319,7 @@ def main():
     ec2_handler = EC2Handler.credentials()
 
     # Example EC2 operations
-    instance_id = ec2_handler.create_instance(
-        "ami-0c55b159cbfafe1f0", "t2.micro", "your-key-name"
-    )
+    instance_id = ec2_handler.create_instance("ami-0c55b159cbfafe1f0", "t2.micro", "your-key-name")
     if instance_id:
         ec2_handler.get_instance_status(instance_id)
         ec2_handler.start_instance(instance_id)

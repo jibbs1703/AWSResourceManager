@@ -27,14 +27,13 @@ dependencies = [
 dev = [
     "pytest>= 8.3.4",
     "ruff==0.9.4",
-
 ]
 
 [build-system]
 requires = ["setuptools", "build"]
 build-backend = "setuptools.build_meta"
 
-[took.setup.packages.find]
+[tool.setup.packages.find]
 where = "src"
 
 [tool.pytest.ini-options]

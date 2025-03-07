@@ -50,9 +50,7 @@ class S3Handler:
         Returns: None
         """
         if region is None:
-            self.client = boto3.client(
-                "s3", aws_access_key_id=access, aws_secret_access_key=secret
-            )
+            self.client = boto3.client("s3", aws_access_key_id=access, aws_secret_access_key=secret)
         else:
             self.location = {"LocationConstraint": region}
             self.client = boto3.client(
@@ -145,21 +143,15 @@ class S3Handler:
         :return: True if the object exists, False otherwise
         """
         try:
-            logger.info(
-                f"Checking if object {object_name} exists in bucket {bucket_name}"
-            )
+            logger.info(f"Checking if object {object_name} exists in bucket {bucket_name}")
             self.client.head_object(Bucket=bucket_name, Key=object_name)
             logger.info(f"Object {object_name} exists in bucket {bucket_name}")
             return True
         except ClientError as e:
             if e.response["Error"]["Code"] == "404":
-                logger.warning(
-                    f"Object {object_name} not found in bucket {bucket_name}"
-                )
+                logger.warning(f"Object {object_name} not found in bucket {bucket_name}")
             else:
-                logger.error(
-                    f"Error checking if object {object_name} exists in S3: {e}"
-                )
+                logger.error(f"Error checking if object {object_name} exists in S3: {e}")
             return False
 
     def list_objects(self, bucket_name: str) -> list:
@@ -220,9 +212,7 @@ class S3Handler:
 
         """
         try:
-            logger.info(
-                f"Generating pre-signed URL for {object_name} in  bucket {bucket_name}"
-            )
+            logger.info(f"Generating pre-signed URL for {object_name} in  bucket {bucket_name}")
             url = self.client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": bucket_name, "Key": object_name},
@@ -234,9 +224,7 @@ class S3Handler:
             logger.error(f"Error generating pre-signed URL for {object_name}: {e}")
             return None
 
-    def upload_file(
-        self, bucket_name: str, filename: str, file: io.BytesIO, folder: str = ""
-    ):
+    def upload_file(self, bucket_name: str, filename: str, file: io.BytesIO, folder: str = ""):
         """
         Uploads a file to an S3 bucket.
         Parameters:
@@ -252,9 +240,7 @@ class S3Handler:
             self.client.put_object(
                 Bucket=bucket_name, Key=f"{folder}{filename}", Body=file.getvalue()
             )
-            logger.info(
-                f"File {filename} uploaded successfully to {bucket_name}/{folder}"
-            )
+            logger.info(f"File {filename} uploaded successfully to {bucket_name}/{folder}")
         except ClientError as e:
             logger.error(f"Error uploading file to S3: {str(e)}")
 
@@ -303,9 +289,7 @@ class S3Handler:
 
             response = self.client.get_object(Bucket=bucket_name, Key=object_name)
             file_content = StringIO(response["Body"].read().decode("utf-8"))
-            logger.info(
-                f"File '{object_name}' read successfully from bucket '{bucket_name}'."
-            )
+            logger.info(f"File '{object_name}' read successfully from bucket '{bucket_name}'.")
             return file_content
 
         except ClientError as e:
@@ -326,9 +310,7 @@ class S3Handler:
         """
         try:
             self.client.delete_object(Bucket=bucket_name, Key=file_name)
-            logger.info(
-                f"The file '{file_name}' has been deleted from the bucket '{bucket_name}'."
-            )
+            logger.info(f"The file '{file_name}' has been deleted from the bucket '{bucket_name}'.")
             return f"The file '{file_name}' has been deleted from the bucket '{bucket_name}'."
 
         except ClientError as e:
@@ -369,9 +351,7 @@ class S3Handler:
                 CopySource={"Bucket": source_bucket, "Key": source_object},
                 Key=destination_object,
             )
-            logger.info(
-                f"Object copied to s3://{destination_bucket}/{destination_object}"
-            )
+            logger.info(f"Object copied to s3://{destination_bucket}/{destination_object}")
         except ClientError as e:
             logger.error(
                 f"Error copying object from s3://{source_bucket}/{source_object}"
@@ -411,13 +391,9 @@ class S3Handler:
             response = self.client.list_objects_v2(Bucket=bucket_name, Prefix=prefix)
             if "Contents" in response:
                 for obj in response["Contents"]:
-                    logger.info(
-                        f"Object: {obj['Key']} (Last modified: {obj['LastModified']})"
-                    )
+                    logger.info(f"Object: {obj['Key']} (Last modified: {obj['LastModified']})")
             else:
-                logger.info(
-                    f"No objects found with prefix '{prefix}' in s3://{bucket_name}"
-                )
+                logger.info(f"No objects found with prefix '{prefix}' in s3://{bucket_name}")
         except ClientError as e:
             logger.error(f"Error listing objects by prefix in S3: {e}")
 
@@ -530,14 +506,10 @@ class S3Handler:
         try:
             logger.info(f"Getting encryption configuration for bucket {bucket_name}")
             encryption = self.client.get_bucket_encryption(Bucket=bucket_name)
-            logger.info(
-                f"Encryption configuration for bucket {bucket_name}: {encryption}"
-            )
+            logger.info(f"Encryption configuration for bucket {bucket_name}: {encryption}")
             return encryption
         except ClientError as e:
-            logger.error(
-                f"Error retrieving encryption configuration for bucket {bucket_name}: {e}"
-            )
+            logger.error(f"Error retrieving encryption configuration for bucket {bucket_name}: {e}")
             return None
 
 

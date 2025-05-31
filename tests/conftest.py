@@ -1,4 +1,5 @@
 """This module contains default fixtures for the aws_resource_manager package tests."""
+
 import warnings
 
 import pytest

@@ -1,4 +1,7 @@
 # AWS Resource Manager
+![Python Version](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue)
+![text_image_extractor](https://img.shields.io/badge/My%20Package-unreleased-yell)
+![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)
 
 **AWS Resource Manager** is a Python package designed to simplify and automate the management of AWS
 resources, including S3, DynamoDB, and EC2 from  single entrypoint. This package provides custom-written

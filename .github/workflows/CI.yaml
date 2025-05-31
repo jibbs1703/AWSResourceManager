@@ -1,0 +1,17 @@
+name: AWS-Resource-Manager CI Pipeline
+
+on:
+  push:
+    branches:
+      - "feature/**"
+  
+jobs:
+  tests:
+    name: Run Test
+    uses: ./.github/workflows/test-lint.yaml
+    secrets: inherit
+
+  # deploy-test-pypi:
+  #   name: Deploy to Test PyPi
+  #   uses: ./.github/workflows/deploy-test-pypi.yaml
+  #   secrets: inherit

@@ -1,5 +1,5 @@
 # Default commit message
-COMMIT_MSG ?= "Code Changes: Tests Update"
+COMMIT_MSG ?= "Code Changes: Added tests for s3 module"
 
 # Target to add changes to staging
 add:

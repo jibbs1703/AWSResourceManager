@@ -42,7 +42,6 @@ markers = [
 ]
 testpaths = "tests"
 
-
 [project.scripts]
 
 [tool.coverage.run]

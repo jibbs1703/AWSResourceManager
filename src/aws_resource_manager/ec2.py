@@ -1,10 +1,10 @@
+"""Module for managing AWS EC2 resources."""
 import os
 
 import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-
-from src.aws_resource_manager.ec2.logger import configure_logger
+from logger import configure_logger
 
 logger = configure_logger()
 

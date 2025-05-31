@@ -1,0 +1,20 @@
+name: AWS-Resource-Manager CD Pipeline
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  tests:
+    name: Run Test
+    uses: ./.github/workflows/test-lint.yaml
+    secrets: inherit
+
+  # deploy-pypi:
+  #   name: Deploy to PyPi
+  #   uses: ./.github/workflows/deploy-pypi.yaml
+  #   secrets: inherit

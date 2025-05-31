@@ -2,7 +2,7 @@
 
 from botocore.exceptions import ClientError
 
-from src.aws_resource_manager.s3.s3 import S3Handler
+from src.aws_resource_manager.s3 import S3Handler
 
 
 def test_s3_connection():

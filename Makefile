@@ -1,5 +1,5 @@
 # Default commit message
-COMMIT_MSG ?= "Code Changes: Package Refactor and Description Update"
+COMMIT_MSG ?= "Code Changes: Tests Update"
 
 # Target to add changes to staging
 add:

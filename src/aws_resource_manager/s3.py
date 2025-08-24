@@ -1,7 +1,6 @@
 """Module for managing AWS S3 resources."""
 import io
 import os
-from io import StringIO
 
 import boto3
 from botocore.exceptions import ClientError
@@ -25,12 +24,17 @@ class S3Handler:
         :return: An instance of the S3Handler class initialized with
         the user's credentials and specified region
         """
-        load_dotenv()
-        secret = os.getenv("ACCESS_SECRET")
-        access = os.getenv("ACCESS_KEY")
+        aws_access_key = os.getenv("AWS_ACCESS_KEY")
+        aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         region = os.getenv("REGION")
 
-        return cls(secret, access, region)
+        if not all([aws_access_key, aws_secret_access_key, region]):
+            load_dotenv()
+            aws_access_key = aws_access_key or os.getenv("AWS_ACCESS_KEY")
+            aws_secret_access_key = aws_secret_access_key or os.getenv("AWS_SECRET_ACCESS_KEY")
+            region = region or os.getenv("REGION")
+
+        return cls(aws_secret_access_key, aws_access_key, region)
 
     def __init__(self, secret, access, region) -> None:
         """
@@ -288,7 +292,7 @@ class S3Handler:
                 return "File not in bucket"
 
             response = self.client.get_object(Bucket=bucket_name, Key=object_name)
-            file_content = StringIO(response["Body"].read().decode("utf-8"))
+            file_content = io.StringIO(response["Body"].read().decode("utf-8"))
             logger.info(f"File '{object_name}' read successfully from bucket '{bucket_name}'.")
             return file_content
 

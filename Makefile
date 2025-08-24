@@ -1,5 +1,5 @@
 # Default commit message
-COMMIT_MSG ?= "Code Changes: Added redshift module"
+COMMIT_MSG ?= "Code Changes: Refactored Cedential Retrieval"
 
 # Target to add changes to staging
 add:

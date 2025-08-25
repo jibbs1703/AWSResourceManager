@@ -5,9 +5,10 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-from logger import configure_logger
 
-logger = configure_logger()
+from aws_resource_manager.logs import get_logger
+
+logger = get_logger()
 
 
 class S3Handler:
@@ -26,13 +27,13 @@ class S3Handler:
         """
         aws_access_key = os.getenv("AWS_ACCESS_KEY")
         aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-        region = os.getenv("REGION")
+        region = os.getenv("AWS_REGION")
 
         if not all([aws_access_key, aws_secret_access_key, region]):
             load_dotenv()
             aws_access_key = aws_access_key or os.getenv("AWS_ACCESS_KEY")
             aws_secret_access_key = aws_secret_access_key or os.getenv("AWS_SECRET_ACCESS_KEY")
-            region = region or os.getenv("REGION")
+            region = region or os.getenv("AWS_REGION")
 
         return cls(aws_secret_access_key, aws_access_key, region)
 

@@ -4,9 +4,10 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
-from logger import configure_logger
 
-logger = configure_logger()
+from aws_resource_manager.logs import get_logger
+
+logger = get_logger()
 
 
 class EC2Handler:

@@ -24,10 +24,6 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Set PYTHONPATH
-        run: |
-          echo "PYTHONPATH=$(pwd)/src/aws_resource_manager" >> $GITHUB_ENV
-
       - name: Lint Python scripts with Ruff
         run: |
           python -m ruff check src/ tests/

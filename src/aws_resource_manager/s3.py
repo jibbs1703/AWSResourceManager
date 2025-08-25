@@ -6,7 +6,7 @@ import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
-from aws_resource_manager.logs import get_logger
+from src.aws_resource_manager.logs import get_logger
 
 logger = get_logger()
 

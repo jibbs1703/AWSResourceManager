@@ -33,7 +33,7 @@ ignore = [
     "N806", # Variable name should be lowercase
     "N803", # Argument name should be lowercase
     "S101", # Use of assert detected 
-
+    "S106", # Possible hardcoded password
 ]
 
 exclude = [

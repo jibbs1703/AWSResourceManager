@@ -12,7 +12,7 @@ logger = get_logger()
 
 class S3Handler:
     """Class to Handle S3 operations."""
-    def __init__(self, secret, access, region) -> None:
+    def __init__(self) -> None:
         """
         Initializes the S3Handler class with user credentials and creates
         the AWS S3 client.

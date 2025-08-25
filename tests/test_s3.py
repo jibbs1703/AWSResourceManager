@@ -18,7 +18,7 @@ def test_s3handler_init_with_region(mock_boto_client, mock_get_credentials):
     mock_client_instance = MagicMock()
     mock_boto_client.return_value = mock_client_instance
 
-    handler = S3Handler("secret", "access", "region")
+    handler = S3Handler()
 
     mock_get_credentials.assert_called_once()
     mock_boto_client.assert_called_with(
@@ -40,7 +40,7 @@ def test_s3handler_init_without_region(mock_boto_client, mock_get_credentials):
     mock_client_instance = MagicMock()
     mock_boto_client.return_value = mock_client_instance
 
-    handler = S3Handler("secret", "access", None)
+    handler = S3Handler()
 
     mock_get_credentials.assert_called_once()
     mock_boto_client.assert_called_with(

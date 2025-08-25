@@ -1,42 +1,17 @@
 """Module for managing AWS S3 resources."""
 import io
-import os
 
 import boto3
 from botocore.exceptions import ClientError
-from dotenv import load_dotenv
 
+from src.aws_resource_manager.credentials import get_credentials
 from src.aws_resource_manager.logs import get_logger
 
 logger = get_logger()
 
 
 class S3Handler:
-    @classmethod
-    def credentials(cls) -> "S3Handler":
-        """
-        Retrieves AWS credentials from a hidden environment file.
-
-        This class method accesses the user's AWS secret and access
-        keys stored in an environment file. If a region is specified,
-        the methods within the S3Handler class will execute in that region.
-        Otherwise, AWS will assign a default region.
-
-        :return: An instance of the S3Handler class initialized with
-        the user's credentials and specified region
-        """
-        aws_access_key = os.getenv("AWS_ACCESS_KEY")
-        aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-        region = os.getenv("AWS_REGION")
-
-        if not all([aws_access_key, aws_secret_access_key, region]):
-            load_dotenv()
-            aws_access_key = aws_access_key or os.getenv("AWS_ACCESS_KEY")
-            aws_secret_access_key = aws_secret_access_key or os.getenv("AWS_SECRET_ACCESS_KEY")
-            region = region or os.getenv("AWS_REGION")
-
-        return cls(aws_secret_access_key, aws_access_key, region)
-
+    """Class to Handle S3 operations."""
     def __init__(self, secret, access, region) -> None:
         """
         Initializes the S3Handler class with user credentials and creates
@@ -54,18 +29,21 @@ class S3Handler:
 
         Returns: None
         """
+        aws_access_key_id, aws_secret_access_key, region = get_credentials()
         if region is None:
-            self.client = boto3.client("s3", aws_access_key_id=access, aws_secret_access_key=secret)
+            self.client = boto3.client("s3",
+                                       aws_access_key_id=aws_access_key_id,
+                                       aws_secret_access_key=aws_secret_access_key)
         else:
             self.location = {"LocationConstraint": region}
             self.client = boto3.client(
                 "s3",
-                aws_access_key_id=access,
-                aws_secret_access_key=secret,
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
                 region_name=region,
             )
 
-    def list_buckets(self) -> list:
+    def list_buckets(self) -> list | None:
         """
         Retrieves and returns a list of bucket names available in the user's
         AWS account.

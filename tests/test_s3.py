@@ -1,7 +1,6 @@
 """Tests for the S3 module of the AWS Resource Manager package."""
 
 import io
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -11,69 +10,46 @@ from src.aws_resource_manager.s3 import S3Handler
 
 
 @pytest.mark.unit
-@pytest.mark.parametrize(
-    "env_vars, expected_secret, expected_access, expected_region",
-    [
-        (
-            {"AWS_ACCESS_KEY": "A", "AWS_SECRET_ACCESS_KEY": "S", "AWS_REGION": "R"},
-            "S", "A", "R"
-        ),
-        (
-            {"AWS_ACCESS_KEY": None, "AWS_SECRET_ACCESS_KEY": None, "AWS_REGION": None},
-            "S2", "A2", "R2"
-        ),
-    ]
-)
-def test_credentials(monkeypatch, env_vars, expected_secret, expected_access, expected_region):
-    # Patch os.getenv to return values from env_vars
-    def getenv_side_effect(key):
-        return env_vars.get(key)
-    monkeypatch.setattr(os, "getenv", getenv_side_effect)
+@patch("src.aws_resource_manager.s3.get_credentials")
+@patch("src.aws_resource_manager.s3.boto3.client")
+def test_s3handler_init_with_region(mock_boto_client, mock_get_credentials):
 
-    # Patch load_dotenv and os.getenv for second call
-    with patch("src.aws_resource_manager.s3.os.getenv") as mock_env:
-        # For the first case, all env vars are present, so load_dotenv should not be called
-        if all(env_vars.values()):
-            mock_env.side_effect = getenv_side_effect
-        else:
-            # For the second case, simulate .env loading
-            def getenv_after_load(key):
-                mapping = {"AWS_ACCESS_KEY": "A2",
-                           "AWS_SECRET_ACCESS_KEY": "S2",
-                           "AWS_REGION": "R2"}
-                return mapping.get(key)
-            mock_env.side_effect = getenv_after_load
+    mock_get_credentials.return_value = ("access", "secret", "region")
+    mock_client_instance = MagicMock()
+    mock_boto_client.return_value = mock_client_instance
 
-        with patch("src.aws_resource_manager.s3.S3Handler.__init__",
-                   return_value=None) as mock_init:
-            S3Handler.credentials()
-            mock_init.assert_called_with(expected_secret, expected_access, expected_region)
+    handler = S3Handler("secret", "access", "region")
+
+    mock_get_credentials.assert_called_once()
+    mock_boto_client.assert_called_with(
+        "s3",
+        aws_access_key_id="access",
+        aws_secret_access_key="secret",
+        region_name="region",
+    )
+    assert hasattr(handler, "location")
+    assert handler.client == mock_client_instance
 
 
 @pytest.mark.unit
-def test_init_with_region():
-    with patch("src.aws_resource_manager.s3.boto3.client") as mock_boto:
-        handler = S3Handler("secret", "access", "region")
-        assert hasattr(handler, "client")
-        assert handler.location == {"LocationConstraint": "region"}
-        mock_boto.assert_called_with(
-            "s3",
-            aws_access_key_id="access",
-            aws_secret_access_key="secret",
-            region_name="region",
-        )
+@patch("src.aws_resource_manager.s3.get_credentials")
+@patch("src.aws_resource_manager.s3.boto3.client")
+def test_s3handler_init_without_region(mock_boto_client, mock_get_credentials):
 
+    mock_get_credentials.return_value = ("access", "secret", None)
+    mock_client_instance = MagicMock()
+    mock_boto_client.return_value = mock_client_instance
 
-@pytest.mark.unit
-def test_init_without_region():
-    with patch("src.aws_resource_manager.s3.boto3.client") as mock_boto:
-        handler = S3Handler("secret", "access", None)
-        assert hasattr(handler, "client")
-        mock_boto.assert_called_with(
-            "s3",
-            aws_access_key_id="access",
-            aws_secret_access_key="secret",
-        )
+    handler = S3Handler("secret", "access", None)
+
+    mock_get_credentials.assert_called_once()
+    mock_boto_client.assert_called_with(
+        "s3",
+        aws_access_key_id="access",
+        aws_secret_access_key="secret",
+    )
+    assert not hasattr(handler, "location")
+    assert handler.client == mock_client_instance
 
 
 @pytest.mark.unit

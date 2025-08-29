@@ -29,8 +29,9 @@ dependencies = [
 ]
 [project.optional-dependencies]
 dev = [
-    "pytest>= 8.3.4",
-    "ruff==0.9.4",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.4",
+    "ruff>=0.9.4",
 ]
 
 [build-system]

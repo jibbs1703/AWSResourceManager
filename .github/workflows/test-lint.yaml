@@ -19,10 +19,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Upgrade pip
         run: |
           python -m pip install --upgrade pip
+
+      - name: Install Build Dependencies
+        run: |
+          python -m pip install build setuptools
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Install Package Dependencies
+        run: |
+          pip install .[dev]
 
       - name: Lint Python scripts with Ruff
         run: |
@@ -30,9 +38,13 @@ jobs:
 
       - name: Run test with pytest
         run: |
-          if ls tests/*.py 1> /dev/null 2>&1;
-          then
             pytest -v tests/
-          else
-            echo "No tests found, skipping..."
-          fi
+
+      - name: Build package
+        run: python -m build
+        working-directory: .
+      
+      - name: Verify package
+        run: |
+          pip install dist/*.whl
+          python -c "import aws_resource_manager"
